@@ -6,8 +6,11 @@ module.exports = {
   },
   extends: [
     'standard',
+    'plugin:@next/next/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'next/core-web-vitals',
+    'next/typescript',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -45,6 +48,8 @@ module.exports = {
     'jsx-a11y/role-supports-aria-props': 'warn',
     '@typescript-eslint/no-require-imports': 'warn',
     'react/no-unknown-property': ['error', { ignore: ['css'] }],
+    'react/no-unescaped-entities': 'off',
+    '@next/next/no-page-custom-font': 'off',
   },
   settings: {
     react: {
