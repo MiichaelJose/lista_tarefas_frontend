@@ -9,3 +9,12 @@
 h3 {
     font-weight: bold;
 }
+
+.glimmer-line {
+    display: block;
+    width: 60%;
+    height: 20px;
+    margin: 10px;
+    border-radius: 4px;
+    background: #f0f0f0;
+  }
