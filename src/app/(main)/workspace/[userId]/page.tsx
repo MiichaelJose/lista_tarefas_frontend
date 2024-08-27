@@ -1,14 +1,15 @@
 "use client"
-import { Suspense, useEffect, useState } from "react"
-import Loading from "./loading"
+import { useEffect, useState } from "react"
 import Notification from "@/app/components/notification"
 
 type Workspace = {
+  userId: string
   name: string
+  image?: string
 }
 
-async function getData() {
-  const res = await fetch('http://localhost:3002/workspace/all/')
+async function getData(userId: string) {
+  const res = await fetch(`http://localhost:3002/workspace/userId/${userId}`)
   const data = await res.json()
   return data
 }
@@ -23,19 +24,20 @@ async function postWorkspace(base: any) {
   return data
 }
 
-export default function Page() {
+export default function Page({params}: { params: {userId: string} }) {
   const [data, setData] = useState([]) // Estado inicial como array vazio
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
-  const [nameWorkspace, setNameWorkspace] = useState<Workspace>({name: ''})
+  const [workspace, setWorkspace] = useState<Workspace>({userId: '', name: '', image: undefined})
   const [isSpinner, setIsSpinner] = useState(false)
   const [isNotification, setIsNotification] = useState(false)
   const [isTypeNotification, setTypeNotification] = useState("")
+  const [base64String, setBase64String] = useState("")
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const result = await getData()
+        const result = await getData(params.userId)
         setData(result)
       } catch (error) {
         console.error('Erro ao buscar os dados:', error)
@@ -46,16 +48,31 @@ export default function Page() {
     fetchData()
   }, [])
 
-  const handleChange = (event: any) => {
-    setNameWorkspace({ name: event.target.value })
+  const handleChangeName = (event: any) => {
+    setWorkspace({ userId: params.userId, name: event.target.value })
+  }
+
+  const handleImage = (event: any) => {
+    const file = event.target.files[0] 
+    console.log(file);
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setBase64String(base64);
+        setWorkspace({...workspace, image: base64});
+      };
+
+      reader.readAsDataURL(file);
+    }
   }
   
   async function handleSubmit() {
     setIsSpinner(true)
     setIsNotification(false)
-
     try {
-      const result = await postWorkspace(nameWorkspace)
+      const result = await postWorkspace(workspace)
 
       if(!result) {
         throw new Error('Erro ao cadastrar workspace.');
@@ -99,7 +116,7 @@ export default function Page() {
         <div className="relative w-5/6 md:w-3/12  rounded-md  flex flex-col p-3 items-start ">
           <label htmlFor="name" className="text-white/80">Nome</label>
           <div className="flex justify-between items-center content-center flex-row">
-            <input name="name" type="text" className="w-4/4 h-10 rounded-md outline-none p-3 bg-gray-600 text-white " onChange={handleChange}/>
+            <input name="name" type="text" className="w-4/4 h-10 rounded-md outline-none p-3 bg-gray-600 text-white " onChange={handleChangeName}/>
             <div className="flex items-center justify-center w-10 h-10">
               <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -107,7 +124,7 @@ export default function Page() {
                           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                       </svg>
                   </div>
-                  <input id="dropzone-file" type="file" className="hidden" />
+                  <input id="dropzone-file" type="file" className="hidden" onChange={handleImage}/>
               </label>
             </div> 
           </div>
