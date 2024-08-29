@@ -1,10 +1,13 @@
 'use client'
 import { usePathname } from "next/navigation"
+import { getStorage } from "../utils/localStorage"
+
 import Link from "next/link"
 
 export function NavLinks() {
     const pathname = usePathname()
-    
+    const base_result = getStorage()
+
     return (
       <>
         <div className="flex w-full md:h-1/6 md:justify-center  justify-between  items-center">
@@ -37,6 +40,10 @@ export function NavLinks() {
             </svg>
             <h3 className="ml-5">Task</h3>
           </Link>
+        </div>
+        <div className="text-white text-xs text-center">
+          <p>{base_result.name}</p>
+          <p className=" w-44">{base_result._id}</p>
         </div>
       </>
     )

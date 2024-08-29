@@ -1,6 +1,8 @@
 "use client"
 import { useEffect, useState } from "react"
 import Notification from "@/app/components/notification"
+import { getStorage } from "@/app/utils/localStorage"
+import { useRouter } from 'next/navigation'
 
 type Workspace = {
   userId: string
@@ -33,12 +35,16 @@ export default function Page({params}: { params: {userId: string} }) {
   const [isNotification, setIsNotification] = useState(false)
   const [isTypeNotification, setTypeNotification] = useState("")
   const [base64String, setBase64String] = useState("")
+  const router = useRouter()
+
+  const base_result = getStorage()
 
   useEffect(() => {
     async function fetchData() {
       try {
         const result = await getData(params.userId)
         setData(result)
+        
       } catch (error) {
         console.error('Erro ao buscar os dados:', error)
       } finally {
@@ -53,8 +59,7 @@ export default function Page({params}: { params: {userId: string} }) {
   }
 
   const handleImage = (event: any) => {
-    const file = event.target.files[0] 
-    console.log(file);
+    const file = event.target?.files[0] 
     if (file) {
       const reader = new FileReader();
 
@@ -105,6 +110,10 @@ export default function Page({params}: { params: {userId: string} }) {
     }
   }
 
+  function btnDisplay(workspaceId: string) {
+    router.push(`/display/${workspaceId}`)
+  }
+
   function getModal() {
     return(
       <div className="w-full h-full z-10 absolute top-0 left-0 bg-gradient-to-r from-gray-900/50 via-gray-900/80 to-gray-900/50 flex justify-center items-center">
@@ -121,7 +130,7 @@ export default function Page({params}: { params: {userId: string} }) {
               <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <svg className="w-8 h-8  text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                       </svg>
                   </div>
                   <input id="dropzone-file" type="file" className="hidden" onChange={handleImage}/>
@@ -144,8 +153,8 @@ export default function Page({params}: { params: {userId: string} }) {
               </>
             }
             <button className="flex justify-around items-center mt-3 w-28 h-10 bg-gray-700 rounded-md text-white ml-3" onClick={() => statusModal()}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
               </svg>
               <p>cancelar</p>
             </button>
@@ -178,7 +187,7 @@ export default function Page({params}: { params: {userId: string} }) {
           </div>
           {data.length > 0 ? (
             data.map((item: any, index) => (
-              <div key={index} className="flex w-full justify-center items-center bg-gray-700 rounded-lg">
+              <div onClick={() => btnDisplay(item._id)} key={index} className="flex w-full justify-center items-center bg-gray-700 rounded-lg  hover:bg-gray-600/90">
                 <h2 className="text-white">{item.name}</h2> {/* Exemplo de uso da propriedade "name" */}
               </div>
             ))
