@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import Notification from "@/app/components/notification"
 import { getStorage } from "@/app/utils/localStorage"
 import { useRouter } from 'next/navigation'
+import { environment } from "@/app/config"
 
 type Workspace = {
   userId: string
@@ -11,13 +12,13 @@ type Workspace = {
 }
 
 async function getData(userId: string) {
-  const res = await fetch(`http://localhost:3002/workspace/userId/${userId}`)
+  const res = await fetch(`${environment.URL_SERVER_TODOLIST}/workspace/userId/${userId}`)
   const data = await res.json()
   return data
 }
 
 async function postWorkspace(base: any) {
-  const res = await fetch('http://localhost:3002/workspace', {
+  const res = await fetch(`${process.env.URL_SERVER_TODOLIST}/workspace`, {
     method: 'POST',
     headers: {'content-type':'application/json'},
     body: JSON.stringify(base)
@@ -26,8 +27,8 @@ async function postWorkspace(base: any) {
   return data
 }
 
-export default function Page({params}: { params: {userId: string} }) {
-  const [data, setData] = useState([]) // Estado inicial como array vazio
+export default function Page() {
+  const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
   const [workspace, setWorkspace] = useState<Workspace>({userId: '', name: '', image: undefined})
@@ -35,14 +36,15 @@ export default function Page({params}: { params: {userId: string} }) {
   const [isNotification, setIsNotification] = useState(false)
   const [isTypeNotification, setTypeNotification] = useState("")
   const [base64String, setBase64String] = useState("")
+
   const router = useRouter()
 
   const base_result = getStorage()
-
+  
   useEffect(() => {
     async function fetchData() {
       try {
-        const result = await getData(params.userId)
+        const result = await getData(base_result._id)
         setData(result)
         
       } catch (error) {
@@ -55,7 +57,7 @@ export default function Page({params}: { params: {userId: string} }) {
   }, [])
 
   const handleChangeName = (event: any) => {
-    setWorkspace({ userId: params.userId, name: event.target.value })
+    setWorkspace({ userId: base_result._id, name: event.target.value })
   }
 
   const handleImage = (event: any) => {
@@ -111,6 +113,7 @@ export default function Page({params}: { params: {userId: string} }) {
   }
 
   function btnDisplay(workspaceId: string) {
+    localStorage.setItem('display', JSON.stringify(workspaceId));
     router.push(`/display/${workspaceId}`)
   }
 
@@ -127,7 +130,7 @@ export default function Page({params}: { params: {userId: string} }) {
           <div className="flex justify-between items-center content-center flex-row">
             <input name="name" type="text" className="w-4/4 h-10 rounded-md outline-none p-3 bg-gray-600 text-white " onChange={handleChangeName}/>
             <div className="flex items-center justify-center w-10 h-10">
-              <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+              <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 ">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <svg className="w-8 h-8  text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                           <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
@@ -175,8 +178,8 @@ export default function Page({params}: { params: {userId: string} }) {
       <h1 className=" text-2xl text-white/80">Workspace</h1>
       <div className="w-full h-5/6 my-5 rounded-sm">
         <div className="flex align-middle items-end">
-          <div className="w-28 h-10 bg-gray-500/50 content-center text-center rounded-md">
-            <h4 className="text-white/80 text-sm">/workspace</h4>
+          <div className="w-auto h-10 bg-gray-700/50 content-center text-center rounded-md p-2">
+            <h4 className="text-white/80 text-xs">/userid/{base_result._id}</h4>
           </div>
         </div>
         <div className="grid gap-4 w-full h-full bg-gray-600/10 p-2 grid-cols-3 auto-rows-fr">

@@ -1,47 +1,5 @@
-"use client"
-import { useEffect, useState } from "react";
-import { useRouter } from 'next/navigation'
-
-
-async function getData(workspaceId: string) {
-  const res = await fetch(`http://localhost:3002/display/workspaceid/${workspaceId}`)
-  const data = await res.json()
-  
-  return data
-}
-
-export default function Page({params}: { params: {workspaceid: string} }) {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState(false)
-
-  const router = useRouter()
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const result = await getData(params.workspaceid)
-        console.log(result);
-        
-        setData(result)
-        
-      } catch (error) {
-        console.error('Erro ao buscar os dados:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
-
-  function statusModal() {
-    if(!modal) {
-      setModal(true)
-    }else {
-      setModal(false)
-    }
-  }
-
+export default function Page({params}: any) {
+    
   function getModal() {
     return(
       <div className="w-full h-full z-10 absolute top-0 left-0 bg-gradient-to-r from-gray-900/50 via-gray-900/80 to-gray-900/50 flex justify-center items-center">
@@ -78,15 +36,9 @@ export default function Page({params}: { params: {workspaceid: string} }) {
     )
   }
 
-  function btnTask(displayId: string) {
-    localStorage.setItem('task', JSON.stringify(displayId));
-    router.push(`/task/${displayId}`)
-  }
-
   return (
-    <>
-      {modal && getModal()}
-      <h1 className=" text-2xl text-white/80">Display</h1>
+        <>
+          <h1 className=" text-2xl text-white/80">Display</h1>
       <div className="w-full h-5/6 my-5 rounded-sm">
         <div className="flex align-middle items-end">
           <div className="w-auto h-10 bg-gray-700/50 content-center text-center rounded-md p-2">
@@ -100,17 +52,9 @@ export default function Page({params}: { params: {workspaceid: string} }) {
             </svg>
             
           </div>
-          {data.length > 0 ? (
-              data.map((item: any, index) => (
-                <div onClick={() => btnTask(item._id)} key={index} className="flex w-full justify-center items-center bg-gray-700 rounded-lg  hover:bg-gray-600/90">
-                  <h2 className="text-white">{item.type}</h2> {/* Exemplo de uso da propriedade "name" */}
-                </div>
-              ))
-            ) : (
-              <div></div>
-            )}
+          
         </div>
       </div>
-    </>
-  )
+        </>
+    )
 }   

@@ -1,0 +1,4 @@
+export const environment = {
+    URL_SERVER_AUTH:"http://localhost:3001",
+    URL_SERVER_TODOLIST:"http://localhost:3002"
+}

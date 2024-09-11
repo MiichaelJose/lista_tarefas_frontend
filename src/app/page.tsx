@@ -1,14 +1,15 @@
 "use client"
 import { useRouter } from 'next/navigation'
 import { useState } from "react"
+import { environment } from './config'
 
 type User = {
   email: string
   password: string
 }
 
-async function postSingin(base: any) {
-  const res = await fetch('http://localhost:3001/singin', {
+async function postSingIn(base: any) {
+  const res = await fetch(`${environment.URL_SERVER_AUTH}/singin`, {
     method: 'POST',
     headers: {'content-type':'application/json'},
     body: JSON.stringify(base)
@@ -33,13 +34,13 @@ export default function Home() {
   async function handleSubmit() {
     setIsSpinner(true)
     try {
-      const rest = await postSingin(user)
+      const rest = await postSingIn(user)
       
       if(rest.msg) {
         throw new Error('Usuario não encontrado.');
       }
       localStorage.setItem('data', JSON.stringify(rest));
-      router.push(`/workspace/${rest._id}`)
+      router.push(`/workspace`)
     } catch (error) {
       console.log(error);
       setIsSpinner(true)
@@ -91,8 +92,9 @@ export default function Home() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-          Not a member?
-          <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Start a 14 day free trial</a>
+          Don't have a registration?
+          <br></br>
+          <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">register</a>
         </p>
       </div>
     </div>
